@@ -203,7 +203,7 @@ def factorECM(n, k=25, limit=10000, div=lenstra, primes=None):
     
 print('Les premiers <20 sont :',sieve(20))
 print()
-s1,s2=0,0
+
 for i in range(2):
     a=nextPrime(randint(1e8,1e12))    
     b=nextPrime(randint(1e8,1e10))
