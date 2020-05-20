@@ -202,12 +202,13 @@ def factorECM(n, k=25, limit=10000, div=lenstra, primes=None):
     return factorECM(g, primes=primes)+factorECM(n//g, primes=primes)
     
 print('Les premiers <20 sont :',sieve(20))
+print()
 s1,s2=0,0
 for i in range(2):
-    #a=nextPrime(randint(1e8,1e15))    
-    #b=nextPrime(randint(1e8,1e16))
-    c=randint(1e8,1e10) 
-    n=c
+    a=nextPrime(randint(1e8,1e12))    
+    b=nextPrime(randint(1e8,1e10))
+    #c=randint(1e8,1e10) 
+    n=a*b
     print('n=',n)
     t=time()
     f=factorECM(n)  
