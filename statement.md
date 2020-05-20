@@ -1,17 +1,20 @@
 # Bonjour!
 
-Ce programme présente la factorisation par la méthode de Lenstra qui utilise des courbes elliptiques sur les entiers modulaires
+Ce programme présente la factorisation par la méthode de Lenstra qui utilise des courbes elliptiques sur les entiers modulaires.  
+Cette version travaille en coordonnées projectives afin d'éviter le recours aux inverses modulaires, lourds à calculer.
 
 ```python runnable
 from time import time
 from random import randint
 from math import gcd
 
+
+# test de Miller pour un témoin a
+# Retourne faux si n est composé et vrai si n est probablement premier
+# d et r doivent vérifier n = 2^r * d + 1 avec d impair   
+
 def millerTest(a,d,n,r):
-    # test de Miller pour un témoin a
-    # Retourne faux si n est composé et vrai si n est probablement premier
-    # d et r doivent vérifier n = 2^r * d + 1 avec d impair   
-           
+         
     x = pow(a, d, n) # Calcule a^d % n   
     if (x == 1  or x == n-1): 
        return True
@@ -26,11 +29,12 @@ def millerTest(a,d,n,r):
     
     return False 
 
+# Test de primalité de Miller Rabin  
+# Si faux alors n est composé et si vrai alors n est probablement premier 
+# k determine le niveau de certitude : P(erreur) < 1/4**k
+
 def isPrime(n, k=25): 
-    # Test de primalité de Miller Rabin  
-    # Si faux alors n est composé et si vrai alors n est probablement premier 
-    # k determine le niveau de certitude : P(erreur) < 1/4**k
-    
+       
     if (n <= 1 or n == 4):
         return False 
     if (n <= 5):
@@ -50,13 +54,15 @@ def isPrime(n, k=25):
               return False  
     return True
 
-def nextPrime(n):
-    # premier suivant n
+# Premier suivant n
+
+def nextPrime(n): 
     while not isPrime(n):
         n += 1
     return n
 
-# Sieve of Eratosthenes
+# Crible d'Eratosthenes
+
 def sieve(n):
     b = [True] * n
     ps = []
@@ -67,6 +73,7 @@ def sieve(n):
                 b[i] = False
     return ps
 
+# Doublement d'un point d'une courbe elliptique (version projective)
 
 def doubleECM(p, a, m):
     px,py,pz=p
@@ -87,12 +94,13 @@ def doubleECM(p, a, m):
     rz = dx3
     return rx %m, ry %m, rz %m
 
+# Addition de deux points d'une courbe elliptique (version projective)
 
-def addECM(p, q, a, m):
+def addECM(p, q, a, m): 
     
     px,py,pz=p
     qx,qy,qz=q
-    # If one point is infinity, return other one
+    # Si un point est infini, retourne l'autre
     if pz == 0: return q
     if qz == 0: return p
     
@@ -103,7 +111,7 @@ def addECM(p, q, a, m):
     
     if x0 == x1:
         if (y0 + y1) %m == 0:
-            return 0, 1, 0  # Infinity        
+            return 0, 1, 0  # Infini        
         return doubleECM(p, a, m)
     
     dy = (y0 - y1) %m
@@ -123,7 +131,8 @@ def addECM(p, q, a, m):
 
 
 
-# Multiplication (repeated addition and doubling)
+# Multiplication par un entier (version projective)
+
 def mulECM(k, p, a, m):
     r = (0, 1, 0)  # Infinity
     while k > 0:                
@@ -135,8 +144,9 @@ def mulECM(k, p, a, m):
 
 
 
-# Lenstra's algorithm for factoring
-# Limit specifies the amount of work permitted
+# Algorithme de Lenstra (version projective)
+# Limit specifie le maximum des premiers à tester
+# Primes est une liste de nombres premiers < limit
 def lenstra(n, limit=1000, primes=None):
   
     if primes is None:
@@ -144,16 +154,16 @@ def lenstra(n, limit=1000, primes=None):
    
     g = n
     while g == n:
-        # Randomized x and y
+        # x et y sont aléatoires
         q = randint(0, n - 1), randint(0, n - 1), 1
-        # Randomized curve coefficient a, computed b
+        # a est aléatoire, b est calculé pour que le point soit sur la courbe
         a = randint(0, n - 1)
         b = (q[1] * q[1] - q[0] * q[0] * q[0] - a * q[0]) % n
-        g = gcd(4 * a * a * a + 27 * b * b, n)  # singularity check
-    # If we got lucky, return lucky factor
+        g = gcd(4 * a * a * a + 27 * b * b, n)  # vérification de singularité
+    # Par chance, g peut être un facteur
     if g > 1:
         return g
-    # increase k step by step until lcm(1, ..., limit)
+    # Multiplier le point q par le PPCM des nombres (1, ..., limit)
     for p in primes:
         pp = p
         while pp < limit:
@@ -161,8 +171,8 @@ def lenstra(n, limit=1000, primes=None):
             
             x,y,z = q
             c = (x*x*x + a * x*z*z + b * z*z*z - y*y*z) %n
-            if c != 0:  # Elliptic arithmetic breaks
-                print('q is not on curve', p)
+            if c != 0:  # Rupture de l'arithmétique elliptique
+                print("q n'est pas sur la courbe après multiplication par", p)
                 g = gcd(z, n)
                 return g
                 
@@ -173,7 +183,7 @@ def lenstra(n, limit=1000, primes=None):
                     return g
                                 
             pp = p * pp
-    #print('lenstrap : g=',g)
+    #print('lenstra : g=',g)
     if g>1:
         return g
     else:
