@@ -169,7 +169,7 @@ def lenstra(n, limit=1000, primes=None):
             if z > 1:                
                 g = gcd(z, n)
                 if g >1:
-                    print('g=',g, 'n=',n)
+                    #print('g=',g, 'n=',n)
                     return g
                                 
             pp = p * pp
