@@ -73,7 +73,7 @@ def sieve(n):
                 b[i] = False
     return ps
 
-# Doublement d'un point d'une courbe elliptique (version projective)
+# Duplication d'un point d'une courbe elliptique (version projective)
 
 def doubleECM(p, a, m):
     px,py,pz=p
