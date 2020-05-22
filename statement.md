@@ -80,7 +80,7 @@ def doubleECM(p, a, m):
     if px==0:
         return p
     if py==0:
-        return 0, 1, 0  # Infinity 
+        return 0, 1, 0  # Infini
     zz = pz*pz
     dy = (3*px*px + a*zz) %m
     dx = (2*py*pz) %m
@@ -170,12 +170,16 @@ def lenstra(n, limit=1000, primes=None):
             q = mulECM(p, q, a, n)
             
             x,y,z = q
+            # Vérification de l'équation de la courbe
+            # Les 5 lignes suivantes peuvent être supprimées pour améliorer la performance
             c = (x*x*x + a * x*z*z + b * z*z*z - y*y*z) %n
             if c != 0:  # Rupture de l'arithmétique elliptique
                 print("q n'est pas sur la courbe après multiplication par", p)
                 g = gcd(z, n)
                 return g
-                
+
+            # Recherche d'un facteur dans z
+            # Les 5 lignes suivantes peuvent être supprimées pour améliorer la performance  
             if z > 1:                
                 g = gcd(z, n)
                 if g >1:
@@ -183,6 +187,8 @@ def lenstra(n, limit=1000, primes=None):
                     return g
                                 
             pp = p * pp
+    
+    g = gcd(z, n)
     #print('lenstra : g=',g)
     if g>1:
         return g
