@@ -134,7 +134,7 @@ def addECM(p, q, a, m):
 # Multiplication par un entier (version projective)
 
 def mulECM(k, p, a, m):
-    r = (0, 1, 0)  # Infinity
+    r = (0, 1, 0)  # Infini
     while k > 0:                
         if k % 2 == 1:
             r = addECM(p, r, a, m)            
